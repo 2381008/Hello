@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="Hello">
+	<property environment="env" />
+	<property name="ECLIPSE_HOME" value="C:/pleiades/eclipse/" />
+	<property name="debuglevel" value="source,lines,vars" />
+	<property name="target" value="1.8" />
+	<property name="source" value="1.8" />
+	<path id="JUnit 5.libraryclasspath">
+		<pathelement location="${ECLIPSE_HOME}plugins/org.junit.jupiter.api_5.1.0.v20180327-1502.jar" />
+		<pathelement location="${ECLIPSE_HOME}plugins/org.junit.jupiter.engine_5.1.0.v20180327-1502.jar" />
+		<pathelement location="${ECLIPSE_HOME}plugins/org.junit.jupiter.migrationsupport_5.1.0.v20180327-1502.jar" />
+		<pathelement location="${ECLIPSE_HOME}plugins/org.junit.jupiter.params_5.1.0.v20180327-1502.jar" />
+		<pathelement location="${ECLIPSE_HOME}plugins/org.junit.platform.commons_1.1.0.v20180327-1502.jar" />
+		<pathelement location="${ECLIPSE_HOME}plugins/org.junit.platform.engine_1.1.0.v20180327-1502.jar" />
+		<pathelement location="${ECLIPSE_HOME}plugins/org.junit.platform.launcher_1.1.0.v20180327-1502.jar" />
+		<pathelement location="${ECLIPSE_HOME}plugins/org.junit.platform.runner_1.1.0.v20180327-1502.jar" />
+		<pathelement location="${ECLIPSE_HOME}plugins/org.junit.platform.suite.api_1.1.0.v20180327-1502.jar" />
+		<pathelement location="${ECLIPSE_HOME}plugins/org.junit.vintage.engine_5.1.0.v20180327-1502.jar" />
+		<pathelement location="${ECLIPSE_HOME}plugins/org.opentest4j_1.0.0.v20180327-1502.jar" />
+		<pathelement location="${ECLIPSE_HOME}plugins/org.apiguardian_1.0.0.v20180327-1502.jar" />
+		<pathelement location="${ECLIPSE_HOME}plugins/org.junit_4.12.0.v201504281640/junit.jar" />
+		<pathelement location="${ECLIPSE_HOME}plugins/org.hamcrest.core_1.3.0.v20180420-1519.jar" />
+	</path>
+	<path id="Hello.classpath">
+		<pathelement location="bin" />
+		<path refid="JUnit 5.libraryclasspath" />
+	</path>
+	<target name="init">
+		<mkdir dir="bin" />
+		<copy includeemptydirs="false" todir="bin">
+			<fileset dir="src">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+		<copy includeemptydirs="false" todir="bin">
+			<fileset dir="srctest">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+	<target name="clean">
+		<delete dir="bin" />
+	</target>
+	<target depends="clean" name="cleanall" />
+	<target depends="build-subprojects,build-project" name="build" />
+	<target name="build-subprojects" />
+	<target depends="init" name="build-project">
+		<echo message="${ant.project.name}: ${ant.file}" />
+		<javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+			<src path="src" />
+			<src path="srctest" />
+			<classpath refid="Hello.classpath" />
+		</javac>
+	</target>
+	<target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects" />
+	<target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+		<copy todir="${ant.library.dir}">
+			<fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar" />
+		</copy>
+		<unzip dest="${ant.library.dir}">
+			<patternset includes="jdtCompilerAdapter.jar" />
+			<fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar" />
+		</unzip>
+	</target>
+	<target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+		<property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter" />
+		<antcall target="build" />
+	</target>
+
+	<!-- compile -->
+	<target name="compile">
+		<mkdir dir="./bin/main" />
+		<javac srcdir="./src/main" destdir="./bin/main" encoding="UTF-8" includeantruntime="false">
+		</javac>
+	</target>
+
+	<!-- test-compile -->
+	<target name="test-compile">
+		<mkdir dir="./bin/test" />
+		<javac srcdir="./src/test" destdir="./bin/test" encoding="UTF-8" includeantruntime="false">
+			<classpath location="./bin/main" />
+			<classpath location="./libs/junit-4.10.jar" />
+		</javac>
+	</target>
+
+	<!-- JUnitテスト -->
+	<target name="test" depends="compile,test-compile">
+		<delete dir="./ant/report" />
+		<mkdir dir="./ant/report" />
+		<junit fork="yes" haltonfailure="no">
+			<classpath location="./libs/junit-4.10.jar" />
+			<classpath location="./bin/test" />
+			<classpath location="./bin/main" />
+			<formatter type="xml" />
+			<batchtest todir="./ant/report">
+				<fileset dir="./bin/test" />
+			</batchtest>
+		</junit>
+	</target>
+
+	<!-- CheckStyle -->
+	<taskdef resource="checkstyletask.properties" classpath="./ant/checkstyle/checkstyle-5.5-all.jar" />
+	<target name="checkstyle">
+		<checkstyle config="./ant/checkstyle/sun_checks.xml" failOnViolation="false">
+			<formatter type="xml" tofile="./ant/report/checkstyle_report.xml" />
+			<fileset dir="./src/main" includes="**/*.java" />
+		</checkstyle>
+	</target>
+
+	<target name="all" depends="clean,compile,test-compile,test,checkstyle" />
+</project>
